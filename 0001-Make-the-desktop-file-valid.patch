@@ -1,0 +1,32 @@
+From 342cc4adec33571e6e0d786a297f0034161dc6ee Mon Sep 17 00:00:00 2001
+From: Matthias Clasen <mclasen@redhat.com>
+Date: Tue, 27 Apr 2021 16:07:13 -0400
+Subject: [PATCH] Make the desktop file valid
+
+desktop-file-validate was complaining about the
+lack of a main category in the Categories value.
+So add one.
+---
+ compositor/data/org.gnome.Kiosk.desktop.in.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compositor/data/org.gnome.Kiosk.desktop.in.in b/compositor/data/org.gnome.Kiosk.desktop.in.in
+index bf6ec39..bb603c8 100644
+--- a/compositor/data/org.gnome.Kiosk.desktop.in.in
++++ b/compositor/data/org.gnome.Kiosk.desktop.in.in
+@@ -1,12 +1,12 @@
+ [Desktop Entry]
+ Type=Application
+ Name=GNOME Kiosk
+ Comment=Compositor for Kiosk and Single Application deployments
+ Exec=@bindir@/gnome-kiosk
+-Categories=GNOME;GTK;Core;
++Categories=GNOME;GTK;Core;System;
+ OnlyShowIn=GNOME;
+ NoDisplay=true
+ X-GNOME-Autostart-Phase=DisplayServer
+ X-GNOME-Provides=panel;windowmanager;
+ X-GNOME-Autostart-Notify=true
+ X-GNOME-AutoRestart=false
+--
+2.31.1
