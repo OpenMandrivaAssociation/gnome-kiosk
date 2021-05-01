@@ -8,8 +8,8 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        40.alpha
-Release:        1
+Version:        40
+Release:        alpha.0
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
