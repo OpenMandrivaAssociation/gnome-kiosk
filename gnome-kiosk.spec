@@ -1,5 +1,3 @@
-%global major_version %(echo -n %{tarball_version} | sed 's/[.].*//')
-
 %global gettext_version                         0.19.6
 %global gnome_desktop_version                   40~rc
 %global glib2_version                           2.68.0
@@ -16,7 +14,7 @@ Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
 URL:            https://gitlab.gnome.org/halfline/gnome-kiosk
-Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.alpha.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/40/%{name}-%{version}.alpha.tar.xz
 
 Provides:       firstboot(windowmanager) = %{name}
 
@@ -64,7 +62,7 @@ BuildArch:      noarch
 This package provides a full screen firefox window pointed to google.
 
 %prep
-%autosetup -S git -n %{name}-%{tarball_version}
+%autosetup -S git -n %{name}-%{version}.alpha
 
 %build
 %meson
