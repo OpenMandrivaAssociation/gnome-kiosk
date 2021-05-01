@@ -1,0 +1,187 @@
+From f553708a756682d625f51e7c0f3d2a31f39442bb Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Thu, 15 Apr 2021 14:39:55 -0400
+Subject: [PATCH 2/4] input-sources-manager: Fix overzealous rename mistake
+
+At some point during development something called
+KioskInputSources got renamed to KioskInputSourceGroup.
+
+Unfortunately, my sed-fu was weak and I renamed things it shouldn't.
+
+This commit fixes the errors.
+---
+ compositor/kiosk-input-sources-manager.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/compositor/kiosk-input-sources-manager.c b/compositor/kiosk-input-sources-manager.c
+index 58d7a4c..a1a4cfa 100644
+--- a/compositor/kiosk-input-sources-manager.c
++++ b/compositor/kiosk-input-sources-manager.c
+@@ -1,60 +1,60 @@
+ #include "config.h"
+ #include "kiosk-input-sources-manager.h"
+ 
+ #include <stdlib.h>
+ #include <string.h>
+ 
+ #include <xkbcommon/xkbcommon.h>
+ #include <meta/display.h>
+ #include <meta/keybindings.h>
+ #include <meta/util.h>
+ 
+ #include <meta/meta-backend.h>
+ #include <meta/meta-plugin.h>
+ 
+ #define GNOME_DESKTOP_USE_UNSTABLE_API
+ #include <libgnome-desktop/gnome-languages.h>
+ #include <libgnome-desktop/gnome-xkb-info.h>
+ 
+ #include "org.freedesktop.locale1.h"
+ #include "kiosk-compositor.h"
+ #include "kiosk-dbus-utils.h"
+ #include "kiosk-gobject-utils.h"
+ #include "kiosk-input-engine-manager.h"
+ #include "kiosk-input-source-group.h"
+ 
+ #define SD_LOCALE1_BUS_NAME "org.freedesktop.locale1"
+ #define SD_LOCALE1_OBJECT_PATH "/org/freedesktop/locale1"
+ 
+-#define KIOSK_INPUT_SOURCE_GROUP_SCHEMA "org.gnome.desktop.input-sources"
+-#define KIOSK_INPUT_SOURCE_GROUP_SETTING "sources"
++#define KIOSK_INPUT_SOURCES_SCHEMA "org.gnome.desktop.input-sources"
++#define KIOSK_INPUT_SOURCES_SETTING "sources"
+ #define KIOSK_INPUT_OPTIONS_SETTING "xkb-options"
+ 
+ #define KIOSK_INPUT_SOURCE_OBJECTS_PATH_PREFIX "/org/gnome/Kiosk/InputSources"
+ #define KIOSK_KEYBINDINGS_SCHEMA "org.gnome.desktop.wm.keybindings"
+ #define KIOSK_SWITCH_INPUT_SOURCES_KEYBINDING "switch-input-source"
+ #define KIOSK_SWITCH_INPUT_SOURCES_BACKWARD_KEYBINDING "switch-input-source-backward"
+ 
+ #define KIOSK_DBUS_INPUT_SOURCES_MANGER_INPUT_SOURCE_INTERFACE "org.gnome.Kiosk.InputSources.InputSource"
+ 
+ struct _KioskInputSourcesManager
+ {
+         GObject parent;
+ 
+         /* weak references */
+         KioskCompositor *compositor;
+         MetaDisplay     *display;
+ 
+         KioskDBusInputSourcesManager *dbus_service;
+         GDBusObjectManagerServer     *dbus_object_manager;
+ 
+         /* strong references */
+         GCancellable *cancellable;
+         KioskInputEngineManager *input_engine_manager;
+         SdLocale1 *locale_proxy;
+         GnomeXkbInfo *xkb_info;
+         GSettings *input_sources_settings;
+         GSettings *key_binding_settings;
+         GPtrArray *input_source_groups;
+ 
+         /* state */
+@@ -913,94 +913,94 @@ kiosk_input_sources_manager_set_input_sources_from_system_configuration (KioskIn
+ 
+         return TRUE;
+ }
+ 
+ static void
+ on_session_input_configuration_changed (KioskInputSourcesManager *self)
+ {
+         g_debug ("KioskInputSourcesManager: Session input sources configuration changed");
+ 
+         if (self->overriding_configuration) {
+                 g_debug ("KioskInputSourcesManager: Ignoring change, because keymap is overriden");
+                 return;
+         }
+ 
+         kiosk_input_sources_manager_set_input_sources_from_session_configuration (self);
+ }
+ 
+ static void
+ on_session_input_sources_setting_changed (KioskInputSourcesManager *self)
+ {
+         kiosk_gobject_utils_queue_defer_callback (G_OBJECT (self),
+                                                   "[kiosk-input-sources-manager] on_session_input_configuration_changed",
+                                                   self->cancellable,
+                                                   KIOSK_OBJECT_CALLBACK (on_session_input_configuration_changed),
+                                                   NULL);
+ }
+ 
+ gboolean
+ kiosk_input_sources_manager_set_input_sources_from_session_configuration (KioskInputSourcesManager *self)
+ {
+-        g_autoptr (GVariant) input_source_group = NULL;
++        g_autoptr (GVariant) input_sources = NULL;
+         g_auto (GStrv) options = NULL;
+-        gboolean input_source_group_active;
++        gboolean input_sources_active;
+ 
+         g_return_val_if_fail (KIOSK_IS_INPUT_SOURCES_MANAGER (self), FALSE);
+ 
+         g_debug ("KioskInputSourcesManager: Setting input sources from session configuration");
+ 
+         self->overriding_configuration = FALSE;
+ 
+         if (self->input_sources_settings == NULL) {
+-                self->input_sources_settings = g_settings_new (KIOSK_INPUT_SOURCE_GROUP_SCHEMA);
++                self->input_sources_settings = g_settings_new (KIOSK_INPUT_SOURCES_SCHEMA);
+ 
+                 g_signal_connect_object (G_OBJECT (self->input_sources_settings),
+-                                         "changed::" KIOSK_INPUT_SOURCE_GROUP_SETTING,
++                                         "changed::" KIOSK_INPUT_SOURCES_SETTING,
+                                          G_CALLBACK (on_session_input_sources_setting_changed),
+                                          self,
+                                          G_CONNECT_SWAPPED);
+                 g_signal_connect_object (G_OBJECT (self->input_sources_settings),
+                                          "changed::" KIOSK_INPUT_OPTIONS_SETTING,
+                                          G_CALLBACK (on_session_input_sources_setting_changed),
+                                          self,
+                                          G_CONNECT_SWAPPED);
+         }
+ 
+ 
+         options = g_settings_get_strv (self->input_sources_settings, KIOSK_INPUT_OPTIONS_SETTING);
+ 
+-        input_source_group = g_settings_get_value (self->input_sources_settings,
+-                                              KIOSK_INPUT_SOURCE_GROUP_SETTING);
++        input_sources = g_settings_get_value (self->input_sources_settings,
++                                              KIOSK_INPUT_SOURCES_SETTING);
+ 
+-        input_source_group_active = kiosk_input_sources_manager_set_input_sources (self, input_source_group, (const char * const *) options);
++        input_sources_active = kiosk_input_sources_manager_set_input_sources (self, input_sources, (const char * const *) options);
+ 
+-        if (!input_source_group_active) {
++        if (!input_sources_active) {
+                 g_debug ("KioskInputSourcesManager: Session has no valid configured input sources");
+                 return kiosk_input_sources_manager_set_input_sources_from_system_configuration (self);
+         }
+ 
+         return TRUE;
+ }
+ 
+ gboolean
+ kiosk_input_sources_manager_set_input_sources_from_locales (KioskInputSourcesManager *self,
+                                                             const char * const       *locales,
+                                                             const char               *options)
+ {
+         KioskInputSourceGroup *old_input_source_group;
+         g_autofree char *old_selected_layout = NULL;
+         g_autofree char *old_input_engine = NULL;
+         g_autofree char *locales_string = NULL;
+         gboolean input_source_group_active;
+ 
+         g_return_val_if_fail (KIOSK_IS_INPUT_SOURCES_MANAGER (self), FALSE);
+         g_return_val_if_fail (locales != NULL, FALSE);
+ 
+         locales_string = g_strjoinv (",", (GStrv) locales);
+ 
+         g_debug ("KioskInputSourcesManager: Setting keymap from locales '%s'",
+                  locales_string);
+ 
+         self->overriding_configuration = TRUE;
+ 
+         old_input_source_group = kiosk_input_sources_manager_get_selected_input_source_group (self);
+ 
+-- 
+2.30.2
