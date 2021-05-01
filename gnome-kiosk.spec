@@ -1,4 +1,3 @@
-%global tarball_version %%(echo %{version} | tr '~' '.')
 %global major_version %(echo -n %{tarball_version} | sed 's/[.].*//')
 
 %global gettext_version                         0.19.6
@@ -11,18 +10,16 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        40~alpha
-Release:        7%{?dist}
+Version:        40.alpha
+Release:        1
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
 URL:            https://gitlab.gnome.org/halfline/gnome-kiosk
-Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{major_version}/%{name}-%{tarball_version}.alpha.tar.xz
 
 Provides:       firstboot(windowmanager) = %{name}
 
-BuildRequires:  desktop-file-utils
-BuildRequires:  gcc
 BuildRequires:  gettext >= %{gettext_version}
 BuildRequires:  git
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
@@ -32,8 +29,8 @@ BuildRequires:  pkgconfig(gnome-desktop-3.0) >= %{gnome_desktop_version}
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
 BuildRequires:  pkgconfig(libmutter-8) >= %{mutter_version}
-BuildRequires:  mesa-libEGL-devel
-BuildRequires:  mesa-libGL-devel
+BuildRequires:  egl-devel
+BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
 
 Requires:       gnome-settings-daemon%{?_isa} >= %{gnome_settings_daemon_version}
@@ -76,10 +73,6 @@ This package provides a full screen firefox window pointed to google.
 %install
 %meson_install
 
-%check
-desktop-file-validate %{buildroot}%{_datadir}/applications/org.gnome.Kiosk.desktop
-desktop-file-validate %{buildroot}%{_datadir}/applications/org.gnome.Kiosk.SearchApp.desktop
-
 %files
 %license COPYING
 %doc README.md
@@ -91,27 +84,3 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/org.gnome.Kiosk.Searc
 %{_datadir}/gnome-session/sessions/org.gnome.Kiosk.SearchApp.session
 %{_datadir}/xsessions/org.gnome.Kiosk.SearchApp.Session.desktop
 %{_datadir}/wayland-sessions/org.gnome.Kiosk.SearchApp.Session.desktop
-
-%changelog
-* Tue Apr 27 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-7
-- Fix desktop file
-  Resolves: #1954285
-
-* Fri Apr 23 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-6
-- Add vprovides so initial-setup can use this
-
-* Wed Apr 21 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-5
-- Fix keyboard layouts getting out of sync in anaconda
-
-* Tue Apr 20 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-4
-- Fix infinite loop
-
-* Mon Apr 19 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-3
-- Fix crash
-
-* Sun Apr 18 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-2
-- Work with 3rd party keyboard layout selectors
-- Be less aggressive about fullscreening windows
-
-* Mon Apr 12 2021 Ray Strode <rstrode@redhat.com> - 40~alpha-1
-- Initial import
