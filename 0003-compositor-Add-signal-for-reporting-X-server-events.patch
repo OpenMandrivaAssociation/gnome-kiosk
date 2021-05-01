@@ -1,0 +1,228 @@
+From a944f0d27a42028ec18edb17f65957780c400104 Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Thu, 15 Apr 2021 13:28:00 -0400
+Subject: [PATCH 3/4] compositor: Add signal for reporting X server events
+
+The keyboard layout handling code currently doesn't notice
+when the keyboard layout is changed using libxklavier, out from
+under it.
+
+As a first step toward fixing that problem, this commit adds a
+new signal "x-server-event" to KioskCompositor, so that the
+InputSourcesManager can watch for root window property changes.
+---
+ compositor/kiosk-compositor.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/compositor/kiosk-compositor.c b/compositor/kiosk-compositor.c
+index dad7776..14f5de3 100644
+--- a/compositor/kiosk-compositor.c
++++ b/compositor/kiosk-compositor.c
+@@ -9,60 +9,67 @@
+ #include <clutter/clutter.h>
+ #include <clutter/x11/clutter-x11.h>
+ #include <meta/common.h>
+ #include <meta/display.h>
+ #include <meta/main.h>
+ #include <meta/util.h>
+ #include <meta/meta-window-group.h>
+ 
+ #include "kiosk-backgrounds.h"
+ #include "kiosk-input-sources-manager.h"
+ #include "kiosk-service.h"
+ 
+ #include "org.gnome.DisplayManager.Manager.h"
+ 
+ struct _KioskCompositor
+ {
+         MetaPlugin parent;
+ 
+         /* weak references */
+         MetaDisplay *display;
+         ClutterBackend *backend;
+         ClutterActor *stage;
+ 
+         /* strong references */
+         GCancellable *cancellable;
+         KioskBackgrounds *backgrounds;
+         KioskInputSourcesManager *input_sources_manager;
+         KioskService *service;
+ };
+ 
++enum {
++        X_SERVER_EVENT,
++        NUMBER_OF_SIGNALS
++};
++
++static guint signals [NUMBER_OF_SIGNALS] = { 0, };
++
+ G_DEFINE_TYPE (KioskCompositor, kiosk_compositor, META_TYPE_PLUGIN)
+ 
+ static void kiosk_compositor_dispose (GObject *object);
+ 
+ static void
+ kiosk_compositor_dispose (GObject *object)
+ {
+         KioskCompositor *self = KIOSK_COMPOSITOR (object);
+ 
+         if (self->cancellable != NULL) {
+                 g_cancellable_cancel (self->cancellable);
+                 g_clear_object (&self->cancellable);
+         }
+ 
+         g_clear_weak_pointer (&self->stage);
+         g_clear_weak_pointer (&self->display);
+         g_clear_weak_pointer (&self->backend);
+ 
+         g_clear_object (&self->backgrounds);
+ 
+         G_OBJECT_CLASS (kiosk_compositor_parent_class)->dispose (object);
+ }
+ 
+ static void
+ register_with_display_manager (KioskCompositor *self)
+ {
+         g_autoptr (GDBusConnection) system_bus = NULL;
+         g_autoptr (GdmManager) display_manager = NULL;
+         GVariantBuilder builder;
+         g_autoptr (GError) error = NULL;
+@@ -329,62 +336,64 @@ kiosk_compositor_show_tile_preview (MetaPlugin    *plugin,
+         g_assert (META_PLUGIN_CLASS (kiosk_compositor_parent_class)->show_tile_preview == NULL);
+ }
+ 
+ static void
+ kiosk_compositor_hide_tile_preview (MetaPlugin *plugin)
+ {
+         g_assert (META_PLUGIN_CLASS (kiosk_compositor_parent_class)->hide_tile_preview == NULL);
+ }
+ 
+ static void
+ kiosk_compositor_show_window_menu (MetaPlugin         *plugin,
+                                    MetaWindow         *window,
+                                    MetaWindowMenuType  menu,
+                                    int                 x,
+                                    int                 y)
+ {
+         g_assert (META_PLUGIN_CLASS (kiosk_compositor_parent_class)->show_window_menu == NULL);
+ }
+ 
+ static void
+ kiosk_compositor_show_window_menu_for_rect (MetaPlugin *plugin,
+                                             MetaWindow *window,
+                                             MetaWindowMenuType menu,
+                                             MetaRectangle *rect)
+ {
+         g_assert (META_PLUGIN_CLASS (kiosk_compositor_parent_class)->show_window_menu_for_rect == NULL);
+ }
+ 
+ static gboolean
+ kiosk_compositor_xevent_filter (MetaPlugin *plugin,
+-                                XEvent     *xev)
++                                XEvent     *x_server_event)
+ {
++        KioskCompositor *self = KIOSK_COMPOSITOR (plugin);
++        g_signal_emit (G_OBJECT (self), signals[X_SERVER_EVENT], 0, x_server_event);
+         return FALSE;
+ }
+ 
+ static gboolean
+ kiosk_compositor_keybinding_filter (MetaPlugin     *plugin,
+                                     MetaKeyBinding *binding)
+ {
+         return FALSE;
+ }
+ 
+ static void
+ kiosk_compositor_confirm_display_change (MetaPlugin *plugin)
+ {
+         KioskCompositor *self = KIOSK_COMPOSITOR (plugin);
+ 
+         meta_plugin_complete_display_change (META_PLUGIN (self), TRUE);
+ }
+ 
+ static const MetaPluginInfo info = {
+         .name = "GNOME Kiosk",
+         .version = VERSION,
+         .author = "Various",
+         .license = "GPLv2+",
+         .description = "Provides Kiosk compositor plugin for mutter"
+ };
+ 
+ static const MetaPluginInfo *
+ kiosk_compositor_plugin_info (MetaPlugin *plugin)
+ {
+ 
+@@ -420,60 +429,71 @@ kiosk_compositor_class_init (KioskCompositorClass *compositor_class)
+ 
+         plugin_class->start = kiosk_compositor_start;
+         plugin_class->map = kiosk_compositor_map;
+         plugin_class->minimize = kiosk_compositor_minimize;
+         plugin_class->unminimize = kiosk_compositor_unminimize;
+         plugin_class->size_changed = kiosk_compositor_size_changed;
+         plugin_class->size_change = kiosk_compositor_size_change;
+         plugin_class->destroy = kiosk_compositor_destroy;
+ 
+         plugin_class->switch_workspace = kiosk_compositor_switch_workspace;
+ 
+         plugin_class->kill_window_effects = kiosk_compositor_kill_window_effects;
+         plugin_class->kill_switch_workspace = kiosk_compositor_kill_switch_workspace;
+ 
+         plugin_class->show_tile_preview = kiosk_compositor_show_tile_preview;
+         plugin_class->hide_tile_preview = kiosk_compositor_hide_tile_preview;
+         plugin_class->show_window_menu = kiosk_compositor_show_window_menu;
+         plugin_class->show_window_menu_for_rect = kiosk_compositor_show_window_menu_for_rect;
+ 
+         plugin_class->xevent_filter = kiosk_compositor_xevent_filter;
+         plugin_class->keybinding_filter = kiosk_compositor_keybinding_filter;
+ 
+         plugin_class->confirm_display_change = kiosk_compositor_confirm_display_change;
+ 
+         plugin_class->plugin_info = kiosk_compositor_plugin_info;
+ 
+         plugin_class->create_close_dialog = kiosk_compositor_create_close_dialog;
+         plugin_class->create_inhibit_shortcuts_dialog = kiosk_compositor_create_inhibit_shortcuts_dialog;
+ 
+         plugin_class->locate_pointer = kiosk_compositor_locate_pointer;
++
++        signals [X_SERVER_EVENT] =
++                g_signal_new ("x-server-event",
++                              G_TYPE_FROM_CLASS (object_class),
++                              G_SIGNAL_RUN_LAST,
++                              0,
++                              NULL,
++                              NULL,
++                              g_cclosure_marshal_VOID__POINTER,
++                              G_TYPE_NONE,
++                              1, G_TYPE_POINTER);
+ }
+ 
+ static void
+ kiosk_compositor_init (KioskCompositor *compositor)
+ {
+         g_debug ("KioskCompositor: Initializing");
+ }
+ 
+ KioskBackgrounds *
+ kiosk_compositor_get_backgrounds (KioskCompositor *self)
+ {
+         g_return_val_if_fail (KIOSK_IS_COMPOSITOR (self), NULL);
+ 
+         return KIOSK_BACKGROUNDS (self->backgrounds);
+ }
+ 
+ KioskInputSourcesManager *
+ kiosk_compositor_get_input_sources_manager (KioskCompositor *self)
+ {
+         g_return_val_if_fail (KIOSK_IS_COMPOSITOR (self), NULL);
+ 
+         return KIOSK_INPUT_SOURCES_MANAGER (self->input_sources_manager);
+ }
+ 
+ KioskService *
+ kiosk_compositor_get_service (KioskCompositor *self)
+ {
+         g_return_val_if_fail (KIOSK_IS_COMPOSITOR (self), NULL);
+ 
+         return KIOSK_SERVICE (self->service);
+-- 
+2.30.2
