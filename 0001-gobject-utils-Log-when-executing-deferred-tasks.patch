@@ -1,0 +1,115 @@
+From ab8482bab7981321f0f2fbd401907ac34028bb1a Mon Sep 17 00:00:00 2001
+From: Ray Strode <rstrode@redhat.com>
+Date: Tue, 20 Apr 2021 09:27:01 -0400
+Subject: [PATCH 1/4] gobject-utils: Log when executing deferred tasks
+
+At the moment, the code defers execution until "later" in
+various parts of the code to ensure a flood of related events
+doesn't lead to a flood of duplicated work.
+
+But, its on the called code to log at the moment.
+
+This commit adds logging to the generic part of the code to
+for clarity.
+---
+ compositor/kiosk-gobject-utils.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/compositor/kiosk-gobject-utils.c b/compositor/kiosk-gobject-utils.c
+index a0dfcd8..c38db7e 100644
+--- a/compositor/kiosk-gobject-utils.c
++++ b/compositor/kiosk-gobject-utils.c
+@@ -1,83 +1,87 @@
+ #include "config.h"
+ #include "kiosk-gobject-utils.h"
+ 
+ #define COALESCE_INTERVAL 250 /* milliseconds */
+ 
+ static void
+ on_task_wait_complete (GObject *self,
+                        GTask   *task)
+ {
+         KioskObjectCallback callback;
+         gpointer user_data;
+         gboolean completed;
+         g_autofree char *data_key = NULL;
+ 
++        g_debug ("KioskGObjectUtils: Executing deferred task '%s'", g_task_get_name (task));
++
+         callback = g_object_get_data (G_OBJECT (task), "callback");
+         user_data = g_object_get_data (G_OBJECT (task), "user-data");
+ 
+         completed = g_task_propagate_boolean (task, NULL);
+ 
+         if (completed) {
+                 callback (self, user_data);
+         }
+ 
+         data_key = g_strdup_printf ("kiosk-gobject-utils-%p-%p-task",
+                                     callback, user_data);
+ 
+         g_object_set_data (G_OBJECT (self), data_key, NULL);
+ }
+ 
+ static gboolean
+ on_coalesce_timeout (GTask *task)
+ {
+         if (!g_task_return_error_if_cancelled (task)) {
+                 g_task_return_boolean (task, TRUE);
+         }
+ 
+         return G_SOURCE_REMOVE;
+ }
+ 
+ void
+ kiosk_gobject_utils_queue_defer_callback (GObject             *self,
+                                           const char          *name,
+                                           GCancellable        *cancellable,
+                                           KioskObjectCallback  callback,
+                                           gpointer             user_data)
+ {
+         g_autofree char *data_key = NULL;
+         g_autoptr (GSource) timeout_source = NULL;
+         GTask *task;
+ 
+         g_return_if_fail (G_IS_OBJECT (self));
+         g_return_if_fail (callback != NULL);
+ 
+         data_key = g_strdup_printf ("kiosk-gobject-utils-%p-%p-task",
+                                     callback, user_data);
+ 
+         task = g_object_get_data (G_OBJECT (self), data_key);
+ 
+         if (task != NULL) {
+                 return;
+         }
+ 
+         timeout_source = g_timeout_source_new (COALESCE_INTERVAL);
+ 
+-        if (name != NULL) {
+-                g_source_set_name (timeout_source, name);
+-        }
+-
+         task = g_task_new (self,
+                            cancellable,
+                            (GAsyncReadyCallback) on_task_wait_complete,
+                            NULL);
++
++        if (name != NULL) {
++                g_task_set_name (task, name);
++                g_debug ("KioskGObjectUtils: Deferring task '%s' for %dms", name, COALESCE_INTERVAL);
++        }
++
+         g_task_attach_source (task, timeout_source, G_SOURCE_FUNC (on_coalesce_timeout));
+ 
+         g_object_set_data (G_OBJECT (task), "callback", callback);
+         g_object_set_data (G_OBJECT (task), "user-data", user_data);
+ 
+         g_object_set_data_full (G_OBJECT (self),
+                                 data_key,
+                                 task,
+                                 (GDestroyNotify)
+                                 g_object_unref);
+ }
+-- 
+2.30.2
