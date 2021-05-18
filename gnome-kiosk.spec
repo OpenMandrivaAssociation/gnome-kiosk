@@ -34,18 +34,6 @@ BuildRequires:  meson
 Requires:       gnome-settings-daemon%{?_isa} >= %{gnome_settings_daemon_version}
 Requires:       gsettings-desktop-schemas%{?_isa} >= %{gsettings_desktop_schemas_version}
 
-# https://gitlab.gnome.org/halfline/gnome-kiosk/-/merge_requests/1
-Patch10001: 0001-compositor-Be-less-aggressive-about-full-screening-w.patch
-
-# https://gitlab.gnome.org/halfline/gnome-kiosk/-/merge_requests/2
-Patch20001: 0001-gobject-utils-Log-when-executing-deferred-tasks.patch
-Patch20002: 0002-input-sources-manager-Fix-overzealous-rename-mistake.patch
-Patch20003: 0003-compositor-Add-signal-for-reporting-X-server-events.patch
-Patch20004: 0004-input-sources-manager-Support-libxklavier-managed-ke.patch
-
-# https://gitlab.gnome.org/halfline/gnome-kiosk/-/merge_requests/3
-Patch30001: 0001-Make-the-desktop-file-valid.patch
-
 %description
 GNOME Kiosk provides a desktop enviroment suitable for fixed purpose, or
 single application deployments like wall displays and point-of-sale systems.
