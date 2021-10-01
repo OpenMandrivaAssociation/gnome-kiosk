@@ -49,6 +49,18 @@ BuildArch:      noarch
 %description search-appliance
 This package provides a full screen firefox window pointed to google.
 
+%package script-session            
+Summary:        Basic session used for running kiosk application from shell script            
+License:        GPLv2+            
+Requires:       %{name} = %{version}-%{release}            
+Recommends:     gedit      
+Requires:       gnome-session
+
+BuildArch:      noarch
+
+%description script-session
+This package generates a shell script and the necessary scaffolding to start that shell script within a kiosk session.
+
 %prep
 %autosetup -S git -n %{name}-%{version}
 
@@ -64,9 +76,21 @@ This package provides a full screen firefox window pointed to google.
 %doc README.md
 %{_bindir}/gnome-kiosk
 %{_datadir}/applications/org.gnome.Kiosk.desktop
+%{_userunitdir}/org.gnome.Kiosk.target            
+%{_userunitdir}/org.gnome.Kiosk@wayland.service            
+%{_userunitdir}/org.gnome.Kiosk@x11.service
 
 %files -n gnome-kiosk-search-appliance
 %{_datadir}/applications/org.gnome.Kiosk.SearchApp.desktop
 %{_datadir}/gnome-session/sessions/org.gnome.Kiosk.SearchApp.session
 %{_datadir}/xsessions/org.gnome.Kiosk.SearchApp.Session.desktop
 %{_datadir}/wayland-sessions/org.gnome.Kiosk.SearchApp.Session.desktop
+
+%files -n gnome-kiosk-script-session            
+%{_bindir}/gnome-kiosk-script            
+%{_userunitdir}/gnome-session@gnome-kiosk-script.target.d/session.conf            
+%{_userunitdir}/org.gnome.Kiosk.Script.service            
+%{_datadir}/applications/org.gnome.Kiosk.Script.desktop            
+%{_datadir}/gnome-session/sessions/gnome-kiosk-script.session            
+%{_datadir}/wayland-sessions/gnome-kiosk-script-wayland.desktop            
+%{_datadir}/xsessions/gnome-kiosk-script-xorg.desktop
