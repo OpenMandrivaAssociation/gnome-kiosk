@@ -1,0 +1,9 @@
+diff -uraN gnome-kiosk-41.0/kiosk-script/gnome-kiosk-script omv-gnome-kiosk-41.0/kiosk-script/gnome-kiosk-script
+--- gnome-kiosk-41.0/kiosk-script/gnome-kiosk-script	2021-09-23 17:03:25.266170300 +0200
++++ omv-gnome-kiosk-41.0/kiosk-script/gnome-kiosk-script	2021-10-01 16:37:57.681155033 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/sh
++#!/bin/sh
+ 
+ if [ ! -e ~/.local/bin/gnome-kiosk-script ]; then
+     mkdir -p ~/.local/bin ~/.config
