@@ -17,6 +17,9 @@ URL:            https://gitlab.gnome.org/halfline/gnome-kiosk
 Source0:        https://download.gnome.org/sources/%{name}/40/%{name}-%{version}.tar.xz
 Patch0:         fix-usr-bin-sh.patch
 
+# Mandriva patches:
+Patch1:         fix-compilation-with-meson-0.60.patch
+
 Provides:       firstboot(windowmanager) = %{name}
 
 BuildRequires:  gettext >= %{gettext_version}
