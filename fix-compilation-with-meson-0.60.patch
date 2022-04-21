@@ -1,0 +1,12 @@
+diff -uraN gnome-kiosk-42.0/meson.build omv-gnome-kiosk-42.0/meson.build
+--- gnome-kiosk-42.0/meson.build	2022-03-21 21:16:08.072222000 +0100
++++ omv-gnome-kiosk-42.0/meson.build	2022-04-21 17:22:34.629662305 +0200
+@@ -142,7 +142,7 @@
+         configuration: desktop_config_data
+ )
+ 
+-i18n.merge_file('desktop',
++i18n.merge_file(
+         input: desktop_file,
+         output: 'org.gnome.Kiosk.desktop',
+         po_dir: po_dir,
