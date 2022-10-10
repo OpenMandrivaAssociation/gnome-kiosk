@@ -8,7 +8,7 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        42.0
+Version:        43.0
 Release:        1
 Summary:        Window management and application launching for GNOME
 
@@ -18,7 +18,7 @@ Source0:        https://download.gnome.org/sources/%{name}/40/%{name}-%{version}
 Patch0:         fix-usr-bin-sh.patch
 
 # Mandriva patches:
-Patch1:         fix-compilation-with-meson-0.60.patch
+#Patch1:         fix-compilation-with-meson-0.60.patch
 
 Provides:       firstboot(windowmanager) = %{name}
 
@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-3.0) >= %{gnome_desktop_version}
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-10) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-11) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
