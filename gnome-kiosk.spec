@@ -9,7 +9,7 @@
 
 Name:           gnome-kiosk
 Version:        43.0
-Release:        1
+Release:        2
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
