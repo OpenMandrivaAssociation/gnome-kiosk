@@ -8,8 +8,8 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        43.0
-Release:        2
+Version:        44.0
+Release:        1
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-3.0) >= %{gnome_desktop_version}
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-11) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-12) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
@@ -80,6 +80,8 @@ This package generates a shell script and the necessary scaffolding to start tha
 %doc README.md
 %{_bindir}/gnome-kiosk
 %{_datadir}/applications/org.gnome.Kiosk.desktop
+%{_datadir}/dconf/profile/gnomekiosk
+%{_datadir}/gnome-kiosk/gnomekiosk.dconf.compiled
 %{_userunitdir}/org.gnome.Kiosk.target            
 %{_userunitdir}/org.gnome.Kiosk@wayland.service            
 %{_userunitdir}/org.gnome.Kiosk@x11.service
