@@ -8,8 +8,8 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        43.0
-Release:        2
+Version:        44.0
+Release:        1
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
