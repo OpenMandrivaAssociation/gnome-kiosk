@@ -27,7 +27,7 @@ BuildRequires:  git
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gobject-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
-BuildRequires:  pkgconfig(gnome-desktop-3.0) >= %{gnome_desktop_version}
+BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
 BuildRequires:  pkgconfig(libmutter-13) >= %{mutter_version}
