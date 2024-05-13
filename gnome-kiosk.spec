@@ -2,7 +2,7 @@
 %global gnome_desktop_version                   40~rc
 %global glib2_version                           2.68.0
 %global gtk4_version                            3.24.27
-%global mutter_version                          42.0
+%global mutter_version                          46.0
 %global gsettings_desktop_schemas_version       40~rc
 %global ibus_version                            1.5.24
 %global gnome_settings_daemon_version           40~rc
@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-13) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-14) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
