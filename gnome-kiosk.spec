@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-14) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-15) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
