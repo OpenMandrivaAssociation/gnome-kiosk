@@ -95,7 +95,9 @@ This package generates a shell script and the necessary scaffolding to start tha
 %files -n gnome-kiosk-script-session            
 %{_bindir}/gnome-kiosk-script            
 %{_userunitdir}/gnome-session@gnome-kiosk-script.target.d/session.conf            
-%{_userunitdir}/org.gnome.Kiosk.Script.service            
+%{_userunitdir}/org.gnome.Kiosk.Script.service          
+%{_prefix}/lib/systemd/user/gnome-session@org.gnome.Kiosk.SearchApp.target.d/session.conf
+%{_prefix}/lib/systemd/user/org.gnome.Kiosk.SearchApp.service
 %{_datadir}/applications/org.gnome.Kiosk.Script.desktop            
 %{_datadir}/gnome-session/sessions/gnome-kiosk-script.session            
 %{_datadir}/wayland-sessions/gnome-kiosk-script-wayland.desktop            
