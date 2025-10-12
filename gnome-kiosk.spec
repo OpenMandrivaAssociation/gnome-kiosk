@@ -2,19 +2,19 @@
 %global gnome_desktop_version                   40~rc
 %global glib2_version                           2.68.0
 %global gtk4_version                            3.24.27
-%global mutter_version                          46.0
+%global mutter_version                          49.0
 %global gsettings_desktop_schemas_version       40~rc
 %global ibus_version                            1.5.24
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        48.0
+Version:        49.0
 Release:        1
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
 URL:            https://gitlab.gnome.org/halfline/gnome-kiosk
-Source0:        https://download.gnome.org/sources/%{name}/40/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/49/%{name}-%{version}.tar.xz
 #Patch0:         fix-usr-bin-sh.patch
 
 # Mandriva patches:
@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-16) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-17) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
