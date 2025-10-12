@@ -21,7 +21,7 @@ Source0:        https://download.gnome.org/sources/%{name}/49/%{name}-%{version}
 #Patch1:         fix-compilation-with-meson-0.60.patch
 
 Provides:       firstboot(windowmanager) = %{name}
-
+BuildRequires:  desktop-file-utils
 BuildRequires:  gettext >= %{gettext_version}
 BuildRequires:  git
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
