@@ -84,7 +84,7 @@ This package generates a shell script and the necessary scaffolding to start tha
 %{_datadir}/gnome-kiosk/gnomekiosk.dconf.compiled
 %{_userunitdir}/org.gnome.Kiosk.target            
 %{_userunitdir}/org.gnome.Kiosk@wayland.service            
-%{_userunitdir}/org.gnome.Kiosk@x11.service
+#{_userunitdir}/org.gnome.Kiosk@x11.service
 
 %files -n gnome-kiosk-search-appliance
 %{_datadir}/applications/org.gnome.Kiosk.SearchApp.desktop
