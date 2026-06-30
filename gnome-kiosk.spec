@@ -8,13 +8,13 @@
 %global gnome_settings_daemon_version           40~rc
 
 Name:           gnome-kiosk
-Version:        49.0
+Version:        50.1
 Release:        1
 Summary:        Window management and application launching for GNOME
 
 License:        GPLv2+
 URL:            https://gitlab.gnome.org/halfline/gnome-kiosk
-Source0:        https://download.gnome.org/sources/%{name}/49/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/50/%{name}-%{version}.tar.xz
 #Patch0:         fix-usr-bin-sh.patch
 
 # Mandriva patches:
@@ -30,7 +30,7 @@ BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnome-desktop-4)
 BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}
 BuildRequires:  pkgconfig(ibus-1.0) >= %{ibus_version}
-BuildRequires:  pkgconfig(libmutter-17) >= %{mutter_version}
+BuildRequires:  pkgconfig(libmutter-18) >= %{mutter_version}
 BuildRequires:  egl-devel
 BuildRequires:  pkgconfig(dri)
 BuildRequires:  meson
