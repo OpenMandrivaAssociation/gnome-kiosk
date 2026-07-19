@@ -82,6 +82,7 @@ This package generates a shell script and the necessary scaffolding to start tha
 %{_datadir}/applications/org.gnome.Kiosk.desktop
 %{_datadir}/dconf/profile/gnomekiosk
 %{_datadir}/gnome-kiosk/gnomekiosk.dconf.compiled
+%{_datadir}/gnome-kiosk/window-config.ini
 %{_userunitdir}/org.gnome.Kiosk.target            
 %{_userunitdir}/org.gnome.Kiosk@wayland.service            
 
