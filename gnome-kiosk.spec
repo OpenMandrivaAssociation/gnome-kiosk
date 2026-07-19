@@ -84,12 +84,10 @@ This package generates a shell script and the necessary scaffolding to start tha
 %{_datadir}/gnome-kiosk/gnomekiosk.dconf.compiled
 %{_userunitdir}/org.gnome.Kiosk.target            
 %{_userunitdir}/org.gnome.Kiosk@wayland.service            
-#{_userunitdir}/org.gnome.Kiosk@x11.service
 
 %files -n gnome-kiosk-search-appliance
 %{_datadir}/applications/org.gnome.Kiosk.SearchApp.desktop
 %{_datadir}/gnome-session/sessions/org.gnome.Kiosk.SearchApp.session
-%{_datadir}/xsessions/org.gnome.Kiosk.SearchApp.Session.desktop
 %{_datadir}/wayland-sessions/org.gnome.Kiosk.SearchApp.Session.desktop
 
 %files -n gnome-kiosk-script-session            
@@ -101,4 +99,3 @@ This package generates a shell script and the necessary scaffolding to start tha
 %{_datadir}/applications/org.gnome.Kiosk.Script.desktop            
 %{_datadir}/gnome-session/sessions/gnome-kiosk-script.session            
 %{_datadir}/wayland-sessions/gnome-kiosk-script-wayland.desktop            
-%{_datadir}/xsessions/gnome-kiosk-script-xorg.desktop
